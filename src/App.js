@@ -7,14 +7,29 @@ function App() {
   const dispatch = useDispatch();
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
-  const [newName, setNewName] = useState("");
-  const [newUsername, setNewUsername] = useState("");
+  const [isEdit, setIsEdit] = useState(false);
+  const [isId, setIsId] = useState(null);
 
   const handleBody = (e, setState) => {
     const { value } = e.target;
     setState(value);
   };
-  console.log(data);
+  const handleSubmit = () => {
+    if (name !== "" && username !== "") {
+      if (isEdit) {
+        dispatch(updateUsername({ id: isId, name, username }));
+        setName("");
+        setUsername("");
+        setIsEdit(false);
+        setIsId(null);
+      } else {
+        dispatch(addUser({ id: data.length + 1, name, username }));
+        setName("");
+        setUsername("");
+      }
+    }
+  };
+  console.log(isId);
   return (
     <>
       <div>
@@ -22,36 +37,28 @@ function App() {
           type="text"
           placeholder="Name..."
           onChange={(e) => handleBody(e, setName)}
+          value={name}
         />
         <input
           type="text"
           placeholder="Username..."
           onChange={(e) => handleBody(e, setUsername)}
+          value={username}
         />
-        <button type="submit" onClick={() => dispatch(addUser({ id: data.length + 1, name, username }))}>add user</button>
+        <button type="submit" onClick={() => { handleSubmit(isId); }}>{isEdit ? "Edit" : "add user"}</button>
       </div>
       <div>
         {data.slice(0).reverse().map((item) => (
           <div key={item.id}>
             <h1>{item.name}</h1>
             <h2>{item.username}</h2>
-            <input
-              type="text"
-              placeholder="Name..."
-              onChange={(e) => handleBody(e, setNewName)}
-              // defaultValue={item.name}
-            />
-            <input
-              type="text"
-              placeholder="Username..."
-              onChange={(e) => handleBody(e, setNewUsername)}
-              // defaultValue={item.username}
-            />
-
             <button
               type="submit"
               onClick={() => {
-                dispatch(updateUsername({ id: item.id, name: newName, username: newUsername }));
+                setIsEdit(true);
+                setIsId(item.id);
+                setName(item.name);
+                setUsername(item.username);
               }}
             >
               edit
